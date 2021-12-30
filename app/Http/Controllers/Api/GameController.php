@@ -3,36 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Game;
+use App\Cell;
 use App\Http\Requests\CreateGameRequest;
-use Illuminate\Http\Request;
+use App\Exceptions\InvalidStateTransitionException;
+use App\Exceptions\InvalidFlagSymbolException;
 use App\Http\Controllers\Controller;
 
 class GameController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  App\Http\Requests\CreateGameRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(CreateGameRequest $request)
@@ -54,40 +36,50 @@ class GameController extends Controller
      */
     public function show(Game $game)
     {
-        //
+        return response()->json($game);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Uncover a cell of the game.
      *
-     * @param  \App\Game  $game
+     * @param  App\Game $game
+     * @param  App\Cell $cell
      * @return \Illuminate\Http\Response
      */
-    public function edit(Game $game)
+    public function uncover(Game $game, Cell $cell)
     {
-        //
+        try {
+            $game->uncoverCell($cell);
+
+            return response()->json($game);
+        } catch (InvalidStateTransitionException $e) {
+            return response()->json([
+                'message' => 'Uncovered cells cannot be uncovered'
+            ], 403);
+        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Flag a cell of the game.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Game  $game
+     * @param  App\Game $game
+     * @param  App\Cell $cell
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Game $game)
+    public function flag(Game $game, Cell $cell)
     {
-        //
-    }
+        try {
+            $cell->flag(request()->get('symbol'));
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Game  $game
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Game $game)
-    {
-        //
+            return response()->json($game);
+        } catch (InvalidStateTransitionException $e) {
+            return response()->json([
+                'message' => 'Uncovered cells cannot be flagged'
+            ], 403);
+        } catch (InvalidFlagSymbolException $e) {
+            return response()->json([
+                'message' => 'Invalid symbol when trying to flag cell'
+            ], 403);
+        }
     }
 }

@@ -36,8 +36,8 @@ Route::group([
         'middleware' => 'auth:api'
     ], function () {
         Route::post('new', 'Api\GameController@store');
-        Route::get('new', 'Api\GameController@show');
-        Route::post('new', 'Api\GameController@store');
-        Route::post('new', 'Api\GameController@store');
+        Route::get('{game}', 'Api\GameController@show');
+        Route::post('{game}/cell/{cell}/uncover', 'Api\GameController@uncover');
+        Route::post('{game}/cell/{cell}/flag', 'Api\GameController@flag');
     });
 });
