@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Game;
+use App\Http\Requests\CreateGameRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class GameController extends Controller
 {
@@ -33,9 +35,15 @@ class GameController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateGameRequest $request)
     {
-        //
+        $game = new Game($request->all());
+
+        $request->user()->games()->save($game);
+
+        $game->generateBoard();
+
+        return response()->json($game);
     }
 
     /**

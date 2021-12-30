@@ -25,5 +25,19 @@ Route::group([
     ], function () {
         Route::get('logout', 'Api\AuthController@logout');
         Route::get('user', 'Api\AuthController@user');
+        Route::post('game/new', 'Api\GameController@store');
+    });
+});
+
+Route::group([
+    'prefix' => 'game'
+], function () {
+    Route::group([
+        'middleware' => 'auth:api'
+    ], function () {
+        Route::post('new', 'Api\GameController@store');
+        Route::get('new', 'Api\GameController@show');
+        Route::post('new', 'Api\GameController@store');
+        Route::post('new', 'Api\GameController@store');
     });
 });
