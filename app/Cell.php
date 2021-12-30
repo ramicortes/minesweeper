@@ -60,7 +60,7 @@ class Cell extends Model
 
     public function flag($symbol = null)
     {
-        if ($this->state == Cell::COVERED) {
+        if ($this->state == Cell::COVERED || $this->state == Cell::FLAGGED) {
             $this->state = Cell::FLAGGED;
 
             if (in_array($symbol, config('flag-symbols'))) {
