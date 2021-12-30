@@ -17,6 +17,8 @@ class Cell extends Model
     const UNCOVERED = 'uncovered';
     const FLAGGED = 'flagged';
 
+    protected $guarded = ['id'];
+
     /**
      * Get the game that owns the cell.
      */
