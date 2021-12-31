@@ -15,10 +15,15 @@ class Game extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'created_at' => 'datetime:Y-m-d',
-        'updated_at' => 'datetime:Y-m-d',
-        'ended_at' => 'datetime:Y-m-d',
+        'created_at' => 'datetime:Y-m-d H:m:s',
+        'updated_at' => 'datetime:Y-m-d H:m:s',
+        'ended_at' => 'datetime:Y-m-d H:m:s',
     ];
+
+    // Not hidding id since I didn't get to switch to external-id for urls
+    protected $hidden = ['user_id', 'created_at', 'updated_at', 'deleted_at'];
+
+    protected $appends = ['duration'];
 
     /**
      * Get the cells for the game.
@@ -88,8 +93,6 @@ class Game extends Model
                 'mine' => $game->mines > $cellNumber,
             ]);
 
-            // Realized there was no need to store row and column since board knows how to display them but I'm
-            // running out of time. This increases de indexes from "top to bottom" and "left to right".
             $row++;
             if ($row >= $game->rows) {
                 $row = 0;

@@ -25,7 +25,7 @@ class GameController extends Controller
 
         $game->generateBoard();
 
-        return response()->json($game);
+        return response()->json($game->load('cells'));
     }
 
     /**
@@ -36,7 +36,7 @@ class GameController extends Controller
      */
     public function show(Game $game)
     {
-        return response()->json($game);
+        return response()->json($game->load('cells'));
     }
 
     /**
@@ -51,7 +51,7 @@ class GameController extends Controller
         try {
             $game->uncoverCell($cell);
 
-            return response()->json($game);
+            return response()->json($game->load('cells'));
         } catch (InvalidStateTransitionException $e) {
             return response()->json([
                 'message' => 'Uncovered cells cannot be uncovered'
@@ -71,7 +71,7 @@ class GameController extends Controller
         try {
             $cell->flag(request()->get('symbol'));
 
-            return response()->json($game);
+            return response()->json($game->load('cells'));
         } catch (InvalidStateTransitionException $e) {
             return response()->json([
                 'message' => 'Uncovered cells cannot be flagged'

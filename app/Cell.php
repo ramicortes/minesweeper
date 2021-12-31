@@ -7,6 +7,7 @@ use App\Exceptions\InvalidStateTransitionException;
 use App\Exceptions\InvalidFlagSymbolException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 class Cell extends Model
 {
@@ -18,6 +19,9 @@ class Cell extends Model
     const FLAGGED = 'flagged';
 
     protected $guarded = ['id'];
+
+    // Not hidding id since I didn't get to switch to external-id for urls
+    protected $hidden = ['game_id', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * Get the game that owns the cell.
@@ -51,7 +55,18 @@ class Cell extends Model
         if ($this->state != Cell::UNCOVERED) {
             $this->state = Cell::UNCOVERED;
             $this->save();
-            //Still needs to uncover surrounding cells
+
+            $adjacentCellsWithMines = $this->getAdjacentCoveredCellsWithMines()->count();
+
+            if ($adjacentCellsWithMines == 0) {
+                $this->getAdjacentCoveredCellsWithoutMines()->each(function ($cell) {
+                    $cell->uncover();
+                });
+            } else {
+                $this->adjacent_mines = $adjacentCellsWithMines;
+                $this->save();
+            }
+
             return $this;
         } else {
             throw new InvalidStateTransitionException();
@@ -75,5 +90,27 @@ class Cell extends Model
         } else {
             throw new InvalidStateTransitionException();
         }
+    }
+
+    public function getAdjacentCoveredCellsWithoutMines(): Collection
+    {
+        return Cell::where('game_id', '=', $this->game->id)
+            ->where('state', 'not like', 'uncovered')
+            ->where('mine', 'like', false)
+            ->whereBetween('row', [$this->row - 1, $this->row + 1])
+            ->whereBetween('column', [$this->column - 1, $this->column + 1])
+            ->where('id', '!=', $this->id)
+            ->get();
+    }
+
+    public function getAdjacentCoveredCellsWithMines(): Collection
+    {
+        return Cell::where('game_id', '=', $this->game->id)
+            ->where('state', 'not like', 'uncovered')
+            ->where('mine', 'like', true)
+            ->whereBetween('row', [$this->row - 1, $this->row + 1])
+            ->whereBetween('column', [$this->column - 1, $this->column + 1])
+            ->where('id', '!=', $this->id)
+            ->get();
     }
 }
