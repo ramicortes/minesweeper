@@ -16,7 +16,7 @@ class CreateGamesTable extends Migration
         if (!Schema::hasTable('games')) {
             Schema::create('games', function (Blueprint $table) {
                 $table->id();
-                $table->dateTime('ended_at')->nullable();
+                $table->timestamp('ended_at')->nullable();
                 // Next three fields could also be calculated but since I have the information on creation time I'd rather avoid calculation
                 $table->integer('rows');
                 $table->integer('columns');
