@@ -10,7 +10,7 @@ I found this test really interesting and enjoyable, I think it allows a develope
 - Regarding authentication, there was no explicit indication about it and the "Ability to support multiple users/accounts" bullet was at the bottom of priority. I used laravel/passport since it's a well-known and widely-used library, and my approach was thinking this API would be consumed by many external applications (e.g. an app, a browser version) so I used the Oauth2 delegation protocol to allow them to authenticate without permanently exposing their user and password on every request. It would be those application's responsibility to internally restrict their users from modifying other user's games within their platforms, this only ensures that no application can modify another application's games.
 - Liked using SQL to find adjacent cells but it could have also be done with php and maybe some math calculation regarding matrix positions. There's probably a good algorithm out there.
 - Considering it took me almost twice the suggested time I was forced to discard some ideas, so no logging at all is being than and exceptions are not enough and could be handled in a better way. Factories have no states. No mutators were implemented. 
-
+- A Postman collection was included in the root of the project.
 
 ## Needed improvements
 
