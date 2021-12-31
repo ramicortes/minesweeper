@@ -1,61 +1,24 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+## Introduction
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+I found this test really interesting and enjoyable, I think it allows a developer to showcase many of their skills, but I also think it's quite a big task to be made in four hours (that's without considering the bonus points) and still deliver quality code. In my case, it took me about nine hours to do this and I can still think of many improvements that could be done here, which weren't made not because of lack of knowledge but because of time issues. I tried to show at least a bite of as many things I could but I know there are things that I applied in a single part of the application that probably should have been applied in many other places. Overall, I'm satisfied with the final codebase and open to talk about my decisions and mistakes.
 
-## About Laravel
+## Explaining decisions
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- There might be other ways to store Cells instead of using a model for them (like a json structure on the game) that could allow memory saving, I'm aware with multiple users and big boards the cells table could grow quickly. It would have been posible to use something like jessenger/models to then build objects using that json structure to make it easier to use. But with this approach I was able to use many of the framework features and I think if a performance/memory issue is detected in the future it would be possible to schedule a Job to do a cleanup over ended games (or storing those ended games in a json field and create a different way to query those).
+- Many edge cases aren't being taken care of (performing actions over ended games).
+- Some things like a few accessors were implemented but not used. It was only because I tried to include as many features as I could, but they might not be necessary.
+- Regarding authentication, there was no explicit indication about it and the "Ability to support multiple users/accounts" bullet was at the bottom of priority. I used laravel/passport since it's a well-known and widely-used library, and my approach was thinking this API would be consumed by many external applications (e.g. an app, a browser version) so I used the Oauth2 delegation protocol to allow them to authenticate without permanently exposing their user and password on every request. It would be those application's responsibility to internally restrict their users from modifying other user's games within their platforms, this only ensures that no application can modify another application's games.
+- Liked using SQL to find adjacent cells but it could have also be done with php and maybe some math calculation regarding matrix positions. There's probably a good algorithm out there.
+- Considering it took me almost twice the suggested time I was forced to discard some ideas, so no logging at all is being than and exceptions are not enough and could be handled in a better way. Factories have no states. No mutators were implemented. 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Needed improvements
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- All the entity IDs are exposed! I wanted to switch to using an external-id through a uuid field in the models to avoid using actual database IDs on routes and responses. My intention was to generate those IDs throug an Observer in the creating method, but I couldn't spend more time working on this.
+- Some algorithms like the board construction or the adjacent cells discovery can probably be improved. I tried not to google that to allow you to see how I though about it but I'm sure there must be more performant ways to accomplish that.
+- Extra validation is needed on the CreateGameRequest regarding the amount of mines not beeing greater than the board. Also, more requests could have been created.
+- I tried to add at least a few tests to show some of my knowledge regarding TDD and PHPUnit but the truth is there's really little coverage. No Feature testing, no mocking, many critical functionality doesn't have a test. But once again, I couldn't spend more time on this.
+- No control over performing actions like uncovering/flagging cells on ended games.
+- I stopped type hinting and commenting many functions when I realized I wasn't going to make it on time.
+- Poor documentation.
+- No UI.
